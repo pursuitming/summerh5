@@ -386,12 +386,13 @@
     if (tip) $loadingTip.textContent = tip;
   }
 
-  // Preload images
+  // Preload images (节气图 + 中药图)
   function preloadImages() {
     var loaded = 0;
-    var total = Math.min(TERMS.length, 24);
+    var total = TERMS.length * 2; // 24 term + 24 herb
 
     TERMS.forEach(function(t, i) {
+      // 预加载节气图
       var img = new Image();
       img.onload = img.onerror = function() {
         loaded++;
@@ -404,6 +405,19 @@
         }
       };
       img.src = t.image;
+
+      // 预加载中药图
+      var herbImg = new Image();
+      herbImg.onload = herbImg.onerror = function() {
+        loaded++;
+        var pct = Math.round((loaded / total) * 100);
+        var tipIdx = Math.floor((loaded / total) * tips.length);
+        updateLoading(pct, tips[Math.min(tipIdx, tips.length - 1)]);
+        if (loaded >= total) {
+          setTimeout(startApp, 500);
+        }
+      };
+      herbImg.src = t.herbImage;
     });
 
     // Fallback: if images fail to load, start after 3s
@@ -525,11 +539,11 @@
           // Image cards
           '<div class="image-cards">' +
             '<div class="image-card image-card--term">' +
-              '<img class="image-card__img" src="' + t.image + '" alt="' + t.name + '" loading="lazy">' +
+              '<img class="image-card__img" src="' + t.image + '" alt="' + t.name + '">' +
               '<div class="image-card__label">' + t.name + '</div>' +
             '</div>' +
             '<div class="image-card image-card--herb">' +
-              '<img class="image-card__img" src="' + t.herbImage + '" alt="' + t.herb + '" loading="lazy">' +
+              '<img class="image-card__img" src="' + t.herbImage + '" alt="' + t.herb + '">' +
               '<div class="image-card__label">' + t.herbIcon + ' ' + t.herb + '</div>' +
             '</div>' +
           '</div>' +
