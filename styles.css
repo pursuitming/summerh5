@@ -253,6 +253,7 @@ html, body {
   padding: 4rem 1.5rem 3rem;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .term-page__content::-webkit-scrollbar {

@@ -468,6 +468,9 @@
         slideChangeTransitionEnd: onSlideChangeEnd
       }
     });
+
+    // Touch 事件协调：内容可滚动时，滚动到底/顶再翻页
+    initScrollSwiperCoord();
   }
 
   /* ---------- Create Season Divider ---------- */
@@ -605,6 +608,67 @@
 
   function onSlideChangeEnd() {
     // Additional cleanup if needed
+  }
+
+  /* ============================================================
+     SCROLL ↔ SWIPER 协调 — 内容可滚动，滚到底再翻页
+     ============================================================ */
+  function initScrollSwiperCoord() {
+    var swiperEl = document.getElementById('mainSwiper');
+    var startY = 0;
+    var startScrollTop = 0;
+    var contentEl = null;
+    var isScrollable = false;
+
+    swiperEl.addEventListener('touchstart', function(e) {
+      // 获取当前活跃 slide 的内容区
+      var activeSlide = swiper.slides[swiper.activeIndex];
+      if (!activeSlide) return;
+
+      contentEl = activeSlide.querySelector('.term-page__content');
+      if (!contentEl) {
+        // 季节分隔页，不干预
+        contentEl = null;
+        isScrollable = false;
+        return;
+      }
+
+      startY = e.touches[0].clientY;
+      startScrollTop = contentEl.scrollTop;
+      // 判断内容是否超出可视区域（可滚动）
+      isScrollable = contentEl.scrollHeight > contentEl.clientHeight + 2;
+    }, { passive: true });
+
+    swiperEl.addEventListener('touchmove', function(e) {
+      if (!contentEl || !isScrollable) return;
+
+      var currentY = e.touches[0].clientY;
+      var deltaY = startY - currentY; // >0 上滑, <0 下滑
+      var scrollTop = contentEl.scrollTop;
+      var maxScroll = contentEl.scrollHeight - contentEl.clientHeight;
+
+      // 在顶部 + 下滑 → 允许 Swiper 翻到上一页
+      if (scrollTop <= 0 && deltaY < 0) {
+        swiper.allowTouchMove = true;
+        return;
+      }
+
+      // 在底部 + 上滑 → 允许 Swiper 翻到下一页
+      if (scrollTop >= maxScroll - 1 && deltaY > 0) {
+        swiper.allowTouchMove = true;
+        return;
+      }
+
+      // 中间位置 → 禁止 Swiper，让内容滚动
+      swiper.allowTouchMove = false;
+    }, { passive: true });
+
+    // touch 结束时恢复 Swiper
+    swiperEl.addEventListener('touchend', function() {
+      swiper.allowTouchMove = true;
+      contentEl = null;
+      isScrollable = false;
+    }, { passive: true });
   }
 
   /* ---------- Particle System ---------- */
