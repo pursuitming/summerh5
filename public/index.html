@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>本草岁时记 · 二十四节气与中药</title>
+  <meta name="description" content="二十四节气对应中药，感受天地本草之美">
+
+  <!-- 微信分享 Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="本草岁时记 · 二十四节气与中药">
+  <meta property="og:description" content="循四时之序，识本草之道。二十四节气对应中药，感受天地本草之美。">
+  <meta property="og:image" content="https://pursuitming.github.io/summerh5/assets/share-cover.png">
+  <meta property="og:url" content="https://pursuitming.github.io/summerh5/">
+  <meta property="og:site_name" content="本草岁时记">
+
+  <!-- 微信分享缩略图（兼容） -->
+  <link rel="image_src" href="https://pursuitming.github.io/summerh5/assets/share-cover.png">
+
+  <!-- Swiper CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  <!-- Custom Fonts -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ========== 加载页 ========== -->
+  <div id="loading" class="loading">
+    <div class="loading__bg"></div>
+    <div class="loading__content">
+      <div class="loading__icon">🌱</div>
+      <h1 class="loading__title">本草岁时记</h1>
+      <p class="loading__sub">循四时之序 · 识本草之道</p>
+      <div class="loading__bar-wrap">
+        <div class="loading__bar" id="loadingBar"></div>
+      </div>
+      <p class="loading__tip" id="loadingTip">采集中...</p>
+    </div>
+  </div>
+
+  <!-- ========== 主容器 ========== -->
+  <div id="app" class="app" style="display:none;">
+
+    <!-- 背景音乐开关 -->
+    <button class="music-btn" id="musicBtn" aria-label="音乐开关">
+      <span class="music-btn__icon">♪</span>
+    </button>
+
+    <!-- 页码指示器 -->
+    <div class="page-indicator" id="pageIndicator">
+      <span class="page-indicator__current" id="currentPage">01</span>
+      <span class="page-indicator__sep">/</span>
+      <span class="page-indicator__total">24</span>
+    </div>
+
+    <!-- 季节标签 -->
+    <div class="season-badge" id="seasonBadge">春</div>
+
+    <!-- Swiper -->
+    <div class="swiper" id="mainSwiper">
+      <div class="swiper-wrapper" id="swiperWrapper">
+        <!-- 24个节气页面将由JS动态生成 -->
+      </div>
+    </div>
+
+    <!-- 向上滑动提示 -->
+    <div class="swipe-hint" id="swipeHint">
+      <span class="swipe-hint__text">上滑探索下一节气</span>
+      <div class="swipe-hint__arrow">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 4L12 20M12 4L6 10M12 4L18 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="rotate(180 12 12)"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- 粒子层 -->
+    <div class="particles" id="particles"></div>
+  </div>
+
+  <!-- Swiper JS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

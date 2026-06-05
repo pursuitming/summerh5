@@ -1,0 +1,809 @@
+/* ============================================================
+   本草岁时记 · 二十四节气与中药  —  H5样式
+   ============================================================ */
+
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --page-w: 100vw;
+  --page-h: 100vh;
+  --page-h: 100dvh;
+  --gold: #c8a84e;
+  --gold-light: #e8d088;
+  --ink: #2c2c2c;
+  --paper: #f5f0e8;
+  --paper-dark: #e8e0d0;
+  --spring: #6bb86b;
+  --summer: #e8b84b;
+  --autumn: #c88040;
+  --winter: #6080a0;
+  --spring-light: #e8f5e8;
+  --summer-light: #fdf5e0;
+  --autumn-light: #f5e8d8;
+  --winter-light: #e0e8f0;
+  --font-display: "STKaiti", "KaiTi", "楷体", "Noto Serif SC", serif;
+  --font-body: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-poem: "STKaiti", "KaiTi", "楷体", "FZShuSong", serif;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.18);
+  --shadow-card: 0 8px 32px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.08);
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: #1a1a1a;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: pan-y;
+}
+
+/* ---------- Loading Page ---------- */
+.loading {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+.loading.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading__bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #1a2a1a 0%, #2a1a0a 50%, #1a1a2a 100%);
+}
+
+.loading__content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: var(--paper);
+  animation: fadeInUp 0.8s ease both;
+}
+
+.loading__icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: breathe 2s ease-in-out infinite;
+}
+
+.loading__title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  margin-bottom: 0.5rem;
+}
+
+.loading__sub {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  letter-spacing: 0.2em;
+  margin-bottom: 2rem;
+}
+
+.loading__bar-wrap {
+  width: 200px;
+  height: 3px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  margin: 0 auto 1rem;
+  overflow: hidden;
+}
+
+.loading__bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.loading__tip {
+  font-size: 0.75rem;
+  opacity: 0.5;
+}
+
+/* ---------- App Container ---------- */
+.app {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* ---------- Music Button ---------- */
+.music-btn {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.4);
+  background: rgba(0,0,0,0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+.music-btn.is-playing {
+  border-color: var(--gold);
+  color: var(--gold);
+  animation: spin 3s linear infinite;
+}
+
+.music-btn__icon {
+  display: block;
+}
+
+/* ---------- Page Indicator ---------- */
+.page-indicator {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 100;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(0,0,0,0.15);
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+}
+
+.page-indicator__current {
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* ---------- Season Badge ---------- */
+.season-badge {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: white;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(0,0,0,0.2);
+  padding: 4px 16px;
+  border-radius: 20px;
+  letter-spacing: 0.3em;
+  border: 1px solid rgba(255,255,255,0.15);
+  transition: all 0.5s ease;
+}
+
+/* ---------- Swiper ---------- */
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-wrapper {
+  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ---------- Solar Term Page ---------- */
+.term-page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Blurred Background */
+.term-page__bg {
+  position: absolute;
+  inset: -20px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(25px) brightness(0.5);
+  transform: scale(1.1);
+  transition: transform 8s ease;
+}
+.swiper-slide-active .term-page__bg {
+  transform: scale(1.0);
+}
+
+/* Dark overlay */
+.term-page__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0.3) 0%,
+    rgba(0,0,0,0.1) 30%,
+    rgba(0,0,0,0.1) 60%,
+    rgba(0,0,0,0.5) 100%
+  );
+}
+
+/* Content container */
+.term-page__content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 1.5rem 3rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.term-page__content::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- Season Divider (first page of each season) ---------- */
+.season-divider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.season-divider__bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(30px) brightness(0.35);
+  transform: scale(1.15);
+}
+
+.season-divider__overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+}
+
+.season-divider__content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: white;
+}
+
+.season-divider__char {
+  font-family: var(--font-display);
+  font-size: 6rem;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 1s ease 0.3s;
+  text-shadow: 0 4px 30px rgba(0,0,0,0.3);
+}
+.swiper-slide-active .season-divider__char {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.season-divider__line {
+  width: 60px;
+  height: 1px;
+  background: var(--gold);
+  margin: 1.5rem auto;
+  opacity: 0;
+  transform: scaleX(0);
+  transition: all 0.8s ease 0.6s;
+}
+.swiper-slide-active .season-divider__line {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.season-divider__subtitle {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.4em;
+  opacity: 0;
+  transform: translateY(15px);
+  transition: all 0.8s ease 0.9s;
+}
+.swiper-slide-active .season-divider__subtitle {
+  opacity: 0.8;
+  transform: translateY(0);
+}
+
+.season-divider__terms {
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  opacity: 0;
+  transition: all 0.8s ease 1.2s;
+}
+.swiper-slide-active .season-divider__terms {
+  opacity: 0.5;
+}
+
+/* ---------- Term Header ---------- */
+.term-header {
+  text-align: center;
+  color: white;
+  margin-bottom: 1.2rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.7s ease 0.2s;
+}
+.swiper-slide-active .term-header {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.term-header__index {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  opacity: 0.5;
+  margin-bottom: 0.3rem;
+}
+
+.term-header__name {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+
+.term-header__pinyin {
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  opacity: 0.6;
+  margin-top: 0.3rem;
+  text-transform: uppercase;
+}
+
+.term-header__date {
+  font-size: 0.75rem;
+  opacity: 0.5;
+  margin-top: 0.5rem;
+  letter-spacing: 0.1em;
+}
+
+/* ---------- Image Cards ---------- */
+.image-cards {
+  display: flex;
+  gap: 0.8rem;
+  width: 100%;
+  max-width: 340px;
+  margin-bottom: 1.2rem;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.7s ease 0.4s;
+}
+.swiper-slide-active .image-cards {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.image-card {
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  position: relative;
+  aspect-ratio: 3/4;
+  background: rgba(255,255,255,0.1);
+}
+
+.image-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.image-card__label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.6rem 0.5rem 0.4rem;
+  background: linear-gradient(transparent, rgba(0,0,0,0.6));
+  color: white;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  text-align: center;
+  letter-spacing: 0.15em;
+}
+
+.image-card--term {
+  flex: 1.2;
+}
+
+.image-card--herb {
+  flex: 1;
+}
+
+/* ---------- Herb Info ---------- */
+.herb-info {
+  width: 100%;
+  max-width: 340px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.7s ease 0.6s;
+}
+.swiper-slide-active .herb-info {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.herb-info__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.herb-info__icon {
+  font-size: 1.2rem;
+}
+
+.herb-info__name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.herb-info__tag {
+  font-size: 0.6rem;
+  background: rgba(200,168,78,0.3);
+  color: var(--gold-light);
+  padding: 2px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.05em;
+}
+
+.herb-info__desc {
+  font-size: 0.78rem;
+  line-height: 1.6;
+  opacity: 0.85;
+}
+
+/* ---------- Term Detail ---------- */
+.term-detail {
+  width: 100%;
+  max-width: 340px;
+  color: white;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.7s ease 0.8s;
+}
+.swiper-slide-active .term-detail {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.term-detail__summary {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  text-align: center;
+  opacity: 0.9;
+  margin-bottom: 1rem;
+  padding: 0 0.5rem;
+}
+
+.term-detail__keywords {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.term-detail__kw {
+  font-size: 0.65rem;
+  padding: 3px 10px;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 20px;
+  opacity: 0.7;
+  letter-spacing: 0.1em;
+}
+
+.term-detail__sections {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.detail-section {
+  background: rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 0.7rem 0.8rem;
+  border-left: 3px solid var(--gold);
+}
+
+.detail-section__title {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: var(--gold-light);
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.15em;
+}
+
+.detail-section__text {
+  font-size: 0.75rem;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+/* ---------- Poem ---------- */
+.term-poem {
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+  padding: 1rem 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.7s ease 1s;
+}
+.swiper-slide-active .term-poem {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.term-poem__line {
+  font-family: var(--font-poem);
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 2;
+  letter-spacing: 0.15em;
+}
+
+.term-poem__deco {
+  width: 40px;
+  height: 1px;
+  background: var(--gold);
+  margin: 0.8rem auto;
+  opacity: 0.5;
+}
+
+/* ---------- Swipe Hint ---------- */
+.swipe-hint {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  text-align: center;
+  color: rgba(255,255,255,0.5);
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.swipe-hint__text {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.swipe-hint__arrow {
+  animation: bounceUp 1.5s ease-in-out infinite;
+}
+
+.swipe-hint.is-hidden {
+  opacity: 0;
+}
+
+/* ---------- Particles ---------- */
+.particles {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Particle types */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Petals */
+.particle--petal {
+  width: 8px;
+  height: 6px;
+  background: radial-gradient(ellipse, #ffb7c5 30%, #ff8fa3 100%);
+  border-radius: 50% 0;
+  animation: particleDrift var(--dur, 6s) linear var(--delay, 0s) infinite;
+  opacity: 0.7;
+}
+
+/* Rain */
+.particle--rain {
+  width: 1.5px;
+  height: 14px;
+  background: linear-gradient(to bottom, transparent, rgba(174,194,224,0.5));
+  border-radius: 0 0 2px 2px;
+  animation: particleFall var(--dur, 4s) linear var(--delay, 0s) infinite;
+  opacity: 0.5;
+}
+
+/* Snow */
+.particle--snow {
+  width: 5px;
+  height: 5px;
+  background: white;
+  box-shadow: 0 0 4px rgba(255,255,255,0.5);
+  animation: particleDrift var(--dur, 8s) linear var(--delay, 0s) infinite;
+  opacity: 0.6;
+}
+
+/* Leaf */
+.particle--leaf {
+  width: 10px;
+  height: 7px;
+  background: radial-gradient(ellipse, #d4a030 20%, #b8860b 100%);
+  border-radius: 50% 0;
+  animation: particleDrift var(--dur, 7s) linear var(--delay, 0s) infinite;
+  opacity: 0.6;
+}
+
+/* Mist */
+.particle--mist {
+  width: 80px;
+  height: 30px;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: particleDrift var(--dur, 12s) linear var(--delay, 0s) infinite;
+  opacity: 0.4;
+}
+
+/* Firefly */
+.particle--firefly {
+  width: 3px;
+  height: 3px;
+  background: #f0e68c;
+  box-shadow: 0 0 6px 2px rgba(240,230,140,0.4);
+  animation: particleFloat var(--dur, 6s) ease-in-out var(--delay, 0s) infinite;
+  opacity: 0.7;
+}
+
+/* ---------- Animations ---------- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.1); opacity: 0.8; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes bounceUp {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50%      { transform: translateY(-8px); opacity: 1; }
+}
+
+@keyframes particleFall {
+  0%   { transform: translateY(-20px); opacity: 0; }
+  10%  { opacity: var(--max-opacity, 0.5); }
+  90%  { opacity: var(--max-opacity, 0.5); }
+  100% { transform: translateY(calc(var(--page-h, 100vh) + 20px)); opacity: 0; }
+}
+
+@keyframes particleDrift {
+  0%   { transform: translate(0, -20px) rotate(0deg); opacity: 0; }
+  10%  { opacity: var(--max-opacity, 0.6); }
+  90%  { opacity: var(--max-opacity, 0.6); }
+  100% { transform: translate(var(--drift-x, 30px), calc(var(--page-h, 100vh) + 20px)) rotate(var(--drift-r, 180deg)); opacity: 0; }
+}
+
+@keyframes particleFloat {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  20%  { opacity: 0.8; }
+  50%  { transform: translate(var(--drift-x, 20px), -30px); opacity: 0.3; }
+  80%  { opacity: 0.7; }
+  100% { transform: translate(calc(var(--drift-x, 20px) * -1), -60px); opacity: 0; }
+}
+
+@keyframes slideInDown {
+  from { opacity: 0; transform: translateY(-30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Paper texture overlay */
+.app::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139,119,101,0.03) 2px, rgba(139,119,101,0.03) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(139,119,101,0.02) 2px, rgba(139,119,101,0.02) 4px);
+  mix-blend-mode: multiply;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 360px) {
+  .term-header__name { font-size: 1.8rem; }
+  .image-cards { max-width: 300px; gap: 0.6rem; }
+  .herb-info, .term-detail, .term-poem { max-width: 300px; }
+  .term-page__content { padding: 3.5rem 1rem 2.5rem; }
+}
+
+@media (min-width: 414px) {
+  .image-cards { max-width: 360px; }
+  .herb-info, .term-detail, .term-poem { max-width: 360px; }
+}
+
+/* Very tall screens */
+@media (min-height: 800px) {
+  .term-page__content { padding: 5rem 1.5rem 4rem; }
+  .term-header__name { font-size: 2.5rem; }
+}
+
+/* Very short screens */
+@media (max-height: 600px) {
+  .term-page__content { padding: 3rem 1rem 2rem; }
+  .term-header { margin-bottom: 0.8rem; }
+  .image-cards { margin-bottom: 0.8rem; }
+  .herb-info { margin-bottom: 0.6rem; }
+  .term-detail__sections { gap: 0.4rem; }
+}
